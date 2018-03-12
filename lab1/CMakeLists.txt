@@ -9,3 +9,7 @@ add_library (staticLibrary STATIC library.c)
 add_library (dynamicLibrary MODULE library.c)
 
 add_executable(mainStatic main.c)
+add_executable(mainShared main.c)
+
+target_link_libraries(mainStatic staticLibrary)
+target_link_libraries(mainShared sharedLibrary)

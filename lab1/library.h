@@ -1,6 +1,6 @@
 #ifndef LAB1_LIBRARY_H
 #define LAB1_LIBRARY_H
-#define MEMORY_SIZE 5000
+#define MEMORY_SIZE 10000000
 
 #include <glob.h>
 
