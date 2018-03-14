@@ -2,7 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/times.h>
-#include "library.c"
+#include <dlfcn.h>
+
+
+struct InfoAboutArray {
+    char** array;
+    int* ASCIIsum;
+    size_t sizeOfBlock;
+    size_t sizeOfArray;
+    int dynamicallyAlocated;
+};
 
 void initTime(clock_t* startTimeProccessor, struct tms* startTimeKernel) {
     *startTimeProccessor = clock();
@@ -29,6 +38,20 @@ void printTime(clock_t* startTimeProccessor, struct tms* startTimeKernel,
 }
 
 int main(int argc, char *argv[]) {
+    void* library = dlopen("./libdynamicLibrary.so", RTLD_NOW);
+
+    struct InfoAboutArray* (*allocateArray)(size_t, size_t, int);
+    void (*freeArray)(struct InfoAboutArray*);
+    char* (*addBlock)(struct InfoAboutArray*, size_t);
+    void (*deleteBlock)(struct InfoAboutArray*, int);
+    char* (*findTheClosestStringByASCII)(struct InfoAboutArray*, int);
+
+    *(void**) (&allocateArray) = dlsym(library, "allocateArray");
+    *(void**) (&freeArray) = dlsym(library, "freeArray");
+    *(void**) (&addBlock) = dlsym(library, "addBlock");
+    *(void**) (&deleteBlock) = dlsym(library, "deleteBlock");
+    *(void**) (&findTheClosestStringByASCII) = dlsym(library, "findTheClosestStringByASCII");
+
     srand(time(NULL));
 
     clock_t* startTimeProccessor = malloc(sizeof(clock_t));
@@ -37,8 +60,8 @@ int main(int argc, char *argv[]) {
     struct tms* startTimeKernel = malloc(sizeof(struct tms));
     struct tms* endTimeKernel = malloc(sizeof(struct tms));
 
-
     FILE *file;
+
     if (argc > 1) {
         file = fopen(argv[1], "a");
         fprintf(file, "%s \n", "");
@@ -58,27 +81,30 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (int j = 0; j < 10000; ++j) {
-        infoAboutArrays[j] =  allocateArray(1000, 100000, 1);
+        infoAboutArrays[j] =  (*allocateArray)(1000, 100000, 1);
     }
+
+
     printf("%s \n", "Allocating dynamically 100000 arays with size of block equals 1000 and 100000 elements");
     fprintf(file, "%s \n", "Allocating dynamically 100000 arays with size of block equals 1000 and 100000 elements");
     printTime(startTimeProccessor, startTimeKernel, endTimeProccessor, endTimeKernel, file);
 
+
     initTime(startTimeProccessor, startTimeKernel);
     for (int j = 0; j < 10000; ++j) {
-        freeArray(infoAboutArrays[j]);
+        (*freeArray)(infoAboutArrays[j]);
     }
     printf("%s \n", "Freeing previous arrays");
     fprintf(file, "%s \n", "Freeing previous arrays");
     printTime(startTimeProccessor, startTimeKernel, endTimeProccessor, endTimeKernel, file);
 
 
-    infoAboutArray =  allocateArray(100, 100000, 1);
+    infoAboutArray =  (*allocateArray)(100, 100000, 1);
 
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 100000; ++i) {
-        char* string = addBlock(infoAboutArray, i);
+        char* string = (*addBlock)(infoAboutArray, i);
     }
 
     printf("%s \n", "Creating dynamically 100000 blocks");
@@ -88,8 +114,8 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 100000; ++i) {
-        deleteBlock(infoAboutArray, i);
-        char* string = addBlock(infoAboutArray, i);
+        (*deleteBlock)(infoAboutArray, i);
+        char* string = (*addBlock)(infoAboutArray, i);
     }
 
     printf("%s \n", "Deleting and recreating dynamically 100000 blocks");
@@ -98,17 +124,17 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 1000; ++i) {
-        findTheClosestStringByASCII(infoAboutArray, i);
+        (*findTheClosestStringByASCII)(infoAboutArray, i);
     }
 
     printf("%s \n", "Finding the closest string by ASCII 1000 times in dynamical array");
     fprintf(file, "%s \n", "Finding the closest string by ASCII 1000 times in dynamical array");
     printTime(startTimeProccessor, startTimeKernel, endTimeProccessor, endTimeKernel, file);
 
-    freeArray(infoAboutArray);
+    (*freeArray)(infoAboutArray);
 
     initTime(startTimeProccessor, startTimeKernel);
-    infoAboutArray = allocateArray(500, 10000, 0);
+    infoAboutArray = (*allocateArray)(500, 10000, 0);
 
     printf("%s \n", "Allocating statically array with size of block equals 500 and 10000 elements");
     fprintf(file, "%s \n", "Allocating statically array with size of block equals 500 and 10000 elements");
@@ -116,7 +142,7 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 10000; ++i) {
-        char* string = addBlock(infoAboutArray, i);
+        char* string = (*addBlock)(infoAboutArray, i);
     }
 
     printf("%s \n", "Creating statically 10000 blocks");
@@ -125,8 +151,8 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 10000; ++i) {
-        deleteBlock(infoAboutArray, i);
-        char* string = addBlock(infoAboutArray, i);
+        (*deleteBlock)(infoAboutArray, i);
+        char* string = (*addBlock)(infoAboutArray, i);
     }
 
     printf("%s \n", "Deleting and recreating statically 10000 blocks");
@@ -136,7 +162,7 @@ int main(int argc, char *argv[]) {
 
     initTime(startTimeProccessor, startTimeKernel);
     for (size_t i = 0; i < 1000; ++i) {
-        findTheClosestStringByASCII(infoAboutArray, i);
+        (*findTheClosestStringByASCII)(infoAboutArray, i);
     }
 
     printf("%s \n", "Finding the closest string by ASCII 1000 times in statical array");
@@ -144,7 +170,7 @@ int main(int argc, char *argv[]) {
     printTime(startTimeProccessor, startTimeKernel, endTimeProccessor, endTimeKernel, file);
 
     initTime(startTimeProccessor, startTimeKernel);
-    freeArray(infoAboutArray);
+    (*freeArray)(infoAboutArray);
 
     printf("%s \n", "Freeing previous array");
     fprintf(file, "%s \n", "Freeing previous array");

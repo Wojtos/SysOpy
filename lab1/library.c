@@ -39,8 +39,8 @@ char* findTheClosestStringByASCII(struct InfoAboutArray* infoAboutArray, int ind
         return NULL;
     }
 
-    if (infoAboutArray->dynamicallyAlocated) findTheClosestStringByASCIIDynamically(infoAboutArray, index);
-    else findTheClosestStringByASCIIStatically(infoAboutArray, index);
+    if (infoAboutArray->dynamicallyAlocated) return findTheClosestStringByASCIIDynamically(infoAboutArray, index);
+    else return findTheClosestStringByASCIIStatically(infoAboutArray, index);
 }
 
 
