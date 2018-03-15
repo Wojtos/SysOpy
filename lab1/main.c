@@ -30,7 +30,7 @@ void printTime(clock_t* startTimeProccessor, struct tms* startTimeKernel,
 }
 
 void console() {
-    struct InfoAboutArray* infoAboutArray;
+    struct InfoAboutArray* infoAboutArray = NULL;
     while(1) {
         printf("Commands:\n");
         printf("Write 'create_table rozmiar rozmiar_bloku'\n");
@@ -46,6 +46,8 @@ void console() {
         if (inputError == 0) {
             printf("%s\n", "Error input, write again!");
         } else if (strcmp("exit", inputString) == 0 || strcmp("exit ", inputString) == 0) {
+            freeArray(infoAboutArray);
+            infoAboutArray = NULL;
             return;
         } else if (strcmp("create_table", inputString) == 0 || strcmp("create_table ", inputString) == 0) {
             infoAboutArray = allocateArray(inputB, inputA, 1);
@@ -54,19 +56,19 @@ void console() {
             printf("The closest element is %s\n", findTheClosestStringByASCII(infoAboutArray, inputA));
         } else if (strcmp("remove", inputString) == 0 || strcmp("remove ", inputString) == 0) {
             int i = inputB;
-            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+            for (; i < inputA + inputB; ++i) {
                 deleteBlock(infoAboutArray, i);
             }
             printf("Deleted blocks from %d indeks to %d indeks\n", inputB, i);
         } else if (strcmp("add", inputString) == 0 || strcmp("add ", inputString) == 0) {
             int i = inputB;
-            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+            for (; i < inputA + inputB; ++i) {
                 addBlock(infoAboutArray, i);
             }
             printf("Added blocks from %d indeks to %d indeks\n", inputB, i);
         } else if (strcmp("remove_and_add", inputString) == 0 || strcmp("remove_and_add ", inputString) == 0) {
             int i = inputB;
-            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+            for (; i < inputA + inputB; ++i) {
                 deleteBlock(infoAboutArray, i);
                 addBlock(infoAboutArray, i);
             }
