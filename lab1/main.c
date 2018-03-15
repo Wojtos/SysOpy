@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/times.h>
+#include <string.h>
 #include "library.c"
 
 void initTime(clock_t* startTimeProccessor, struct tms* startTimeKernel) {
@@ -28,8 +29,78 @@ void printTime(clock_t* startTimeProccessor, struct tms* startTimeKernel,
     fprintf(file, "Kernel time: %.6lf \n", kernelTime);
 }
 
+void console() {
+    struct InfoAboutArray* infoAboutArray;
+    while(1) {
+        printf("Commands:\n");
+        printf("Write 'create_table rozmiar rozmiar_bloku'\n");
+        printf("Write 'search_element indeks 1'\n");
+        printf("Write 'remove number starting_indeks'\n");
+        printf("Write 'add number starting_indeks'\n");
+        printf("Write 'remove_and_add number starting_indeks'\n");
+        printf("Write 'exit 1 1'\n");
+
+        char inputString[100];
+        int inputA, inputB;
+        int inputError = scanf("%s %d %d", inputString, &inputA, &inputB);
+        if (inputError == 0) {
+            printf("%s\n", "Error input, write again!");
+        } else if (strcmp("exit", inputString) == 0 || strcmp("exit ", inputString) == 0) {
+            return;
+        } else if (strcmp("create_table", inputString) == 0 || strcmp("create_table ", inputString) == 0) {
+            infoAboutArray = allocateArray(inputB, inputA, 1);
+            printf("Allocating dynamically an array with size of block equals %d and %d elements!\n", inputB, inputA);
+        } else if (strcmp("search_element", inputString) == 0 || strcmp("search_element ", inputString) == 0) {
+            printf("The closest element is %s\n", findTheClosestStringByASCII(infoAboutArray, inputA));
+        } else if (strcmp("remove", inputString) == 0 || strcmp("remove ", inputString) == 0) {
+            int i = inputB;
+            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+                deleteBlock(infoAboutArray, i);
+            }
+            printf("Deleted blocks from %d indeks to %d indeks\n", inputB, i);
+        } else if (strcmp("add", inputString) == 0 || strcmp("add ", inputString) == 0) {
+            int i = inputB;
+            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+                addBlock(infoAboutArray, i);
+            }
+            printf("Added blocks from %d indeks to %d indeks\n", inputB, i);
+        } else if (strcmp("remove_and_add", inputString) == 0 || strcmp("remove_and_add ", inputString) == 0) {
+            int i = inputB;
+            for (; i < inputA + inputB && i < infoAboutArray->sizeOfArray; ++i) {
+                deleteBlock(infoAboutArray, i);
+                addBlock(infoAboutArray, i);
+            }
+            printf("Removed and added blocks from %d indeks to %d indeks\n", inputB, i);
+        } else {
+            printf("%s\n", "Wrong command!");
+        }
+        while ( getchar() != '\n' );
+    }
+}
+
 int main(int argc, char *argv[]) {
     srand(time(NULL));
+
+    FILE *file;
+    if (argc > 1) {
+        if (strcmp(argv[1], "console") == 0 || strcmp(argv[1], "console ") == 0) {
+            console();
+            return 0;
+        } else {
+            file = fopen(argv[1], "a");
+            fprintf(file, "%s \n", "");
+            printf("%s \n", "");
+            fprintf(file, "%s \n", argv[2]);
+            printf("%s \n", argv[2]);
+        }
+
+    } else {
+        file = fopen("../raport2.txt", "a");
+    }
+    if (!file) {
+        printf ("%s \n", "Writing to file error!");
+        return 1;
+    }
 
     clock_t* startTimeProccessor = malloc(sizeof(clock_t));
     clock_t* endTimeProccessor = malloc(sizeof(clock_t));;
@@ -38,20 +109,7 @@ int main(int argc, char *argv[]) {
     struct tms* endTimeKernel = malloc(sizeof(struct tms));
 
 
-    FILE *file;
-    if (argc > 1) {
-        file = fopen(argv[1], "a");
-        fprintf(file, "%s \n", "");
-        printf("%s \n", "");
-        fprintf(file, "%s \n", argv[2]);
-        printf("%s \n", argv[2]);
-    } else {
-        file = fopen("../raport2.txt", "a");
-    }
-    if (!file) {
-        printf ("%s \n", "Writing to file error!");
-        return 1;
-    }
+
 
     struct InfoAboutArray* infoAboutArray;
     struct InfoAboutArray* infoAboutArrays[10000];
