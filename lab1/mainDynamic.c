@@ -38,7 +38,9 @@ void printTime(clock_t* startTimeProccessor, struct tms* startTimeKernel,
 }
 
 int main(int argc, char *argv[]) {
-    void* library = dlopen("./libdynamicLibrary.so", RTLD_NOW);
+    char* libraryName = "./libdynamicLibrary.so";
+    if (argc > 3) libraryName = argv[3];
+    void* library = dlopen(libraryName, RTLD_NOW);
 
     struct InfoAboutArray* (*allocateArray)(size_t, size_t, int);
     void (*freeArray)(struct InfoAboutArray*);

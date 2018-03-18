@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/times.h>
 #include <string.h>
-#include "library.c"
+#include "library.h"
 
 void initTime(clock_t* startTimeProccessor, struct tms* startTimeKernel) {
     *startTimeProccessor = clock();
@@ -46,8 +46,6 @@ void console() {
         if (inputError == 0) {
             printf("%s\n", "Error input, write again!");
         } else if (strcmp("exit", inputString) == 0 || strcmp("exit ", inputString) == 0) {
-            freeArray(infoAboutArray);
-            infoAboutArray = NULL;
             return;
         } else if (strcmp("create_table", inputString) == 0 || strcmp("create_table ", inputString) == 0) {
             infoAboutArray = allocateArray(inputB, inputA, 1);

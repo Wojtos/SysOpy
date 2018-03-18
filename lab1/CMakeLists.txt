@@ -69,7 +69,9 @@ foreach(loop_var -O -O1 -O2 -O3 -Os)
     set(testStatic "testStatic${loop_var}")
     set(testDynamic "testDynamic${loop_var}")
 
+    set(dynamicLibraryFile "./libdynamicLibrary${loop_var}.so")
+
     add_test(${testStatic} ${mainStatic} ../raport3b.txt ${testStatic})
     add_test(${testShared} ${mainShared} ../raport3b.txt ${testShared})
-    add_test(${testDynamic} ${mainDynamic} ../raport3b.txt ${testDynamic})
+    add_test(${testDynamic} ${mainDynamic} ../raport3b.txt ${testDynamic} ${dynamicLibraryFile})
 endforeach(loop_var)

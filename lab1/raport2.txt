@@ -1,122 +1,42 @@
  
 test 
 Allocating dynamically 100000 arays with size of block equals 1000 and 100000 elements 
-Real time: 0.047011 
-User time: 0.000000 
-Kernel time: 0.000003 
+Real time: 0.040947 
+User time: 0.000001 
+Kernel time: 0.000002 
 Freeing previous arrays 
-Real time: 0.041800 
+Real time: 0.041467 
 User time: 0.000002 
-Kernel time: 0.000003 
+Kernel time: 0.000002 
 Creating dynamically 100000 blocks 
-Real time: 0.149595 
+Real time: 0.150676 
 User time: 0.000014 
-Kernel time: 0.000000 
+Kernel time: 0.000002 
 Deleting and recreating dynamically 100000 blocks 
-Real time: 0.150674 
-User time: 0.000016 
+Real time: 0.152278 
+User time: 0.000015 
 Kernel time: 0.000000 
 Finding the closest string by ASCII 1000 times in dynamical array 
-Real time: 0.456516 
-User time: 0.000045 
+Real time: 0.479775 
+User time: 0.000048 
 Kernel time: 0.000000 
 Allocating statically array with size of block equals 500 and 10000 elements 
 Real time: 0.000045 
 User time: 0.000000 
 Kernel time: 0.000000 
 Creating statically 10000 blocks 
-Real time: 0.069630 
+Real time: 0.070063 
 User time: 0.000007 
 Kernel time: 0.000000 
 Deleting and recreating statically 10000 blocks 
-Real time: 0.068291 
+Real time: 0.067897 
 User time: 0.000007 
 Kernel time: 0.000000 
 Finding the closest string by ASCII 1000 times in statical array 
-Real time: 0.044470 
-User time: 0.000005 
-Kernel time: 0.000000 
-Freeing previous array 
-Real time: 0.000002 
-User time: 0.000000 
-Kernel time: 0.000000 
-Allocating dynamically 100000 arays with size of block equals 1000 and 100000 elements 
-Real time: 0.053354 
-User time: 0.000000 
-Kernel time: 0.000004 
-Freeing previous arrays 
-Real time: 0.042814 
-User time: 0.000001 
-Kernel time: 0.000004 
-Creating dynamically 100000 blocks 
-Real time: 0.181989 
-User time: 0.000018 
-Kernel time: 0.000000 
-Deleting and recreating dynamically 100000 blocks 
-Real time: 0.154360 
-User time: 0.000015 
-Kernel time: 0.000000 
-Finding the closest string by ASCII 1000 times in dynamical array 
-Real time: 0.475892 
-User time: 0.000048 
-Kernel time: 0.000000 
-Allocating statically array with size of block equals 500 and 10000 elements 
-Real time: 0.000055 
-User time: 0.000000 
-Kernel time: 0.000000 
-Creating statically 10000 blocks 
-Real time: 0.070540 
-User time: 0.000007 
-Kernel time: 0.000000 
-Deleting and recreating statically 10000 blocks 
-Real time: 0.069348 
-User time: 0.000007 
-Kernel time: 0.000000 
-Finding the closest string by ASCII 1000 times in statical array 
-Real time: 0.043686 
+Real time: 0.044319 
 User time: 0.000004 
 Kernel time: 0.000000 
 Freeing previous array 
-Real time: 0.000015 
-User time: 0.000000 
-Kernel time: 0.000000 
-Allocating dynamically 100000 arays with size of block equals 1000 and 100000 elements 
-Real time: 0.041477 
-User time: 0.000000 
-Kernel time: 0.000003 
-Freeing previous arrays 
-Real time: 0.055670 
-User time: 0.000001 
-Kernel time: 0.000005 
-Creating dynamically 100000 blocks 
-Real time: 0.242916 
-User time: 0.000023 
-Kernel time: 0.000001 
-Deleting and recreating dynamically 100000 blocks 
-Real time: 0.226123 
-User time: 0.000023 
-Kernel time: 0.000000 
-Finding the closest string by ASCII 1000 times in dynamical array 
-Real time: 0.493866 
-User time: 0.000049 
-Kernel time: 0.000000 
-Allocating statically array with size of block equals 500 and 10000 elements 
-Real time: 0.000050 
-User time: 0.000000 
-Kernel time: 0.000000 
-Creating statically 10000 blocks 
-Real time: 0.071659 
-User time: 0.000007 
-Kernel time: 0.000000 
-Deleting and recreating statically 10000 blocks 
-Real time: 0.070235 
-User time: 0.000007 
-Kernel time: 0.000000 
-Finding the closest string by ASCII 1000 times in statical array 
-Real time: 0.044478 
-User time: 0.000005 
-Kernel time: 0.000000 
-Freeing previous array 
-Real time: 0.000003 
+Real time: 0.000001 
 User time: 0.000000 
 Kernel time: 0.000000 
