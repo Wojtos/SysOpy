@@ -1,0 +1,128 @@
+Name of test: Copy Using C Functions 4 Bite Block Small
+Real time: 0.000179 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 4 Bite Block Small
+Real time: 0.000352 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using C Functions 4 Bite Block Big
+Real time: 0.000162 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 4 Bite Block Big
+Real time: 0.003302 
+User time: 0.000000 
+Kernel time: 0.000001 
+Name of test: Copy Using C Functions 512 Bite Block Small
+Real time: 0.000260 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 512 Bite Block Small
+Real time: 0.000375 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using C Functions 512 Bite Block Big
+Real time: 0.001394 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 512 Bite Block Big
+Real time: 0.003615 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using C Functions 4096 Bite Block Small
+Real time: 0.001015 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 4096 Bite Block Small
+Real time: 0.000455 
+User time: 0.000000 
+Kernel time: 0.000001 
+Name of test: Copy Using C Functions 4096 Bite Block Big
+Real time: 0.009493 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 4096 Bite Block Big
+Real time: 0.004883 
+User time: 0.000000 
+Kernel time: 0.000001 
+Name of test: Copy Using C Functions 8192 Bite Block Small
+Real time: 0.001793 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using Sys Functions 8192 Bite Block Small
+Real time: 0.000646 
+User time: 0.000000 
+Kernel time: 0.000000 
+Name of test: Copy Using C Functions 8192 Bite Block Big
+Real time: 0.018142 
+User time: 0.000000 
+Kernel time: 0.000002 
+Name of test: Copy Using Sys Functions 8192 Bite Block Big
+Real time: 0.006406 
+User time: 0.000000 
+Kernel time: 0.000001 
+Name of test: sort Using C Functions 4 Bite Block Small
+Real time: 0.023021 
+User time: 0.000001 
+Kernel time: 0.000001 
+Name of test: sort Using Sys Functions 4 Bite Block Small
+Real time: 0.016430 
+User time: 0.000000 
+Kernel time: 0.000002 
+Name of test: sort Using C Functions 4 Bite Block Big
+Real time: 2.477731 
+User time: 0.000042 
+Kernel time: 0.000205 
+Name of test: sort Using Sys Functions 4 Bite Block Big
+Real time: 1.373365 
+User time: 0.000022 
+Kernel time: 0.000116 
+Name of test: sort Using C Functions 512 Bite Block Small
+Real time: 0.017299 
+User time: 0.000000 
+Kernel time: 0.000002 
+Name of test: sort Using Sys Functions 512 Bite Block Small
+Real time: 0.011658 
+User time: 0.000000 
+Kernel time: 0.000001 
+Name of test: sort Using C Functions 512 Bite Block Big
+Real time: 1.901616 
+User time: 0.000039 
+Kernel time: 0.000151 
+Name of test: sort Using Sys Functions 512 Bite Block Big
+Real time: 1.474734 
+User time: 0.000016 
+Kernel time: 0.000131 
+Name of test: sort Using C Functions 4096 Bite Block Small
+Real time: 0.025068 
+User time: 0.000001 
+Kernel time: 0.000002 
+Name of test: sort Using Sys Functions 4096 Bite Block Small
+Real time: 0.019143 
+User time: 0.000001 
+Kernel time: 0.000001 
+Name of test: sort Using C Functions 4096 Bite Block Big
+Real time: 1.816231 
+User time: 0.000029 
+Kernel time: 0.000153 
+Name of test: sort Using Sys Functions 4096 Bite Block Big
+Real time: 1.627072 
+User time: 0.000016 
+Kernel time: 0.000147 
+Name of test: sort Using C Functions 8192 Bite Block Small
+Real time: 0.028192 
+User time: 0.000000 
+Kernel time: 0.000002 
+Name of test: sort Using Sys Functions 8192 Bite Block Small
+Real time: 0.023439 
+User time: 0.000000 
+Kernel time: 0.000003 
+Name of test: sort Using C Functions 8192 Bite Block Big
+Real time: 2.359017 
+User time: 0.000024 
+Kernel time: 0.000211 
+Name of test: sort Using Sys Functions 8192 Bite Block Big
+Real time: 2.427520 
+User time: 0.000019 
+Kernel time: 0.000224 

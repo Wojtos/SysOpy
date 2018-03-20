@@ -282,7 +282,7 @@ int main(int argc, char* argv[]) {
         }
     } else {
 
-        FILE* file = fopen("wyniki.txt", "w");
+        FILE* file = fopen("../wyniki.txt", "w");
 
         clock_t startTimeProccessor;
         clock_t endTimeProccessor;
