@@ -1,5 +1,5 @@
-#define __USE_XOPEN
 #define _GNU_SOURCE
+#define _XOPEN_SOURCE 500
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +7,10 @@
 #include <dirent.h>
 #include <memory.h>
 #include <sys/stat.h>
+#include <ftw.h>
+
+char globalModifier[10];
+time_t globalLastModificationTime;
 
 void printMods(mode_t mode)
 {
@@ -22,7 +26,7 @@ void printMods(mode_t mode)
     printf("\n");
 }
 
-void printTime(time_t* time) {
+void printTime(const time_t* time) {
     char buff[20];
     struct tm* timeinfo;
 
@@ -52,7 +56,7 @@ int searchFilesUsingBasicFunctions(char* path, char* modifier, time_t lastModifi
     }
     struct dirent* current;
     while (current = readdir(mainDirectory)) {
-        if (current->d_name[0] != '.') {
+        if (strcmp(current->d_name, ".") != 0 && strcmp(current->d_name, "..") != 0) {
             strcpy(currentPath,  path);
             if (currentPath[strlen(currentPath) - 1] != '/')
                 strcat(currentPath, "/");
@@ -80,6 +84,36 @@ int searchFilesUsingBasicFunctions(char* path, char* modifier, time_t lastModifi
 }
 
 
+
+int executeOnEachFile(const char* fullPath, const struct stat* infoAboutFile, int flag, struct FTW* ftw) {
+    if (flag == FTW_F) {
+        if (compare(globalModifier, globalLastModificationTime, infoAboutFile->st_mtime)) {
+            printf("%s \n", fullPath);
+            printf("Size in bites: %lu \n", infoAboutFile->st_size);
+            printMods(infoAboutFile->st_mode);
+            printTime(&(infoAboutFile->st_mtime));
+            printf("\n");
+        }
+    }
+    return 0;
+
+}
+
+int searchFilesUsingNftwFunctions(char* path, char* modifier, time_t lastModificationTime) {
+    globalModifier[0] = modifier[0];
+    globalLastModificationTime = lastModificationTime;
+
+    char fullPath[4096];
+    realpath(path, fullPath);
+
+    if (nftw(fullPath, &executeOnEachFile, 1000, FTW_PHYS|FTW_MOUNT) == -1) {
+        printf("Reading files error! \n");
+        return 1;
+    }
+
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc == 5) {
 
@@ -90,8 +124,9 @@ int main(int argc, char* argv[]) {
         if ((strcmp(argv[4], "basic") == 0 || strcmp(argv[4], "basic ") == 0)) {
             searchFilesUsingBasicFunctions(argv[1], argv[2], lastModificationTime);
         } else if ((strcmp(argv[4], "nftw") == 0 || strcmp(argv[4], "nftw ") == 0)) {
-
+            searchFilesUsingNftwFunctions(argv[1], argv[2], lastModificationTime);
         }
+
     }
     return 0;
 }
