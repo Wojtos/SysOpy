@@ -8,6 +8,8 @@
 #include <memory.h>
 #include <sys/stat.h>
 #include <ftw.h>
+#include <unistd.h>
+
 
 char globalModifier[10];
 time_t globalLastModificationTime;
@@ -57,26 +59,24 @@ int searchFilesUsingBasicFunctions(char* path, char* modifier, time_t lastModifi
     struct dirent* current;
     while (current = readdir(mainDirectory)) {
         if (strcmp(current->d_name, ".") != 0 && strcmp(current->d_name, "..") != 0) {
-            strcpy(currentPath,  path);
+            strcpy(currentPath, path);
             if (currentPath[strlen(currentPath) - 1] != '/')
                 strcat(currentPath, "/");
             strcat(currentPath, current->d_name);
-            if (current->d_type == DT_REG) {
-                realpath(currentPath, fullPath);
-                if (stat(fullPath, &infoAboutFile) == -1) {
-                    printf("Getting info about file error! \n");
-                    return 1;
-                }
-                if (compare(modifier, lastModificationTime, infoAboutFile.st_mtime)) {
-                    printf("%s \n", fullPath);
-                    printf("Size in bites: %lu \n", infoAboutFile.st_size);
-                    printMods(infoAboutFile.st_mode);
-                    printTime(&(infoAboutFile.st_mtime));
-                    printf("\n");
-                }
+            realpath(currentPath, fullPath);
+            if (lstat(fullPath, &infoAboutFile) != -1 && !S_ISLNK(infoAboutFile.st_mode)) {
+                if (current->d_type == DT_REG) {
+                    if (compare(modifier, lastModificationTime, infoAboutFile.st_mtime)) {
+                        printf("%s \n", fullPath);
+                        printf("Size in bites: %lu \n", infoAboutFile.st_size);
+                        printMods(infoAboutFile.st_mode);
+                        printTime(&(infoAboutFile.st_mtime));
+                        printf("\n");
+                    }
 
-            } else if (current->d_type == DT_DIR) {
-                searchFilesUsingBasicFunctions(currentPath, modifier, lastModificationTime);
+                } else if (current->d_type == DT_DIR) {
+                    searchFilesUsingBasicFunctions(currentPath, modifier, lastModificationTime);
+                }
             }
         }
     }
@@ -86,7 +86,7 @@ int searchFilesUsingBasicFunctions(char* path, char* modifier, time_t lastModifi
 
 
 int executeOnEachFile(const char* fullPath, const struct stat* infoAboutFile, int flag, struct FTW* ftw) {
-    if (flag == FTW_F) {
+    if (flag == FTW_F ) {
         if (compare(globalModifier, globalLastModificationTime, infoAboutFile->st_mtime)) {
             printf("%s \n", fullPath);
             printf("Size in bites: %lu \n", infoAboutFile->st_size);
@@ -126,6 +126,16 @@ int main(int argc, char* argv[]) {
         } else if ((strcmp(argv[4], "nftw") == 0 || strcmp(argv[4], "nftw ") == 0)) {
             searchFilesUsingNftwFunctions(argv[1], argv[2], lastModificationTime);
         }
+
+    } else {
+        time_t rawtime;
+        struct tm * timeinfo;
+
+        time ( &rawtime );
+        timeinfo = localtime ( &rawtime );
+        symlink("../CMakeLists.txt", "../lel");
+        searchFilesUsingBasicFunctions("..", ">", rawtime);
+        searchFilesUsingNftwFunctions("..", ">", rawtime);
 
     }
     return 0;
