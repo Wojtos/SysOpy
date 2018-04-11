@@ -11,7 +11,7 @@ void run() {
     globalChildPid = fork();
     if (globalChildPid == 0) {
         char* tab[1];
-        tab[1] = NULL;
+        tab[0] = NULL;
         if (execvp("./../endlessTime.sh", tab) == -1) {
             exit(1);
         }
