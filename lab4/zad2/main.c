@@ -20,17 +20,12 @@ __useconds_t microSecunds;
 void recivedSIGUSR2(int sig, siginfo_t *siginfo, void *ucontext) {
     int realTimeSignal = SIGRTMIN + rand() % 32;
     kill(getppid(), realTimeSignal);
-    exit(microSecunds / 1000000);
+    int secunds = microSecunds / 1000000;
+    exit(secunds);
 }
 
 int childProccess() {
     srand(getpid());
-
-    struct sigaction sigactionSIGUSR2;
-    sigactionSIGUSR2.sa_sigaction = recivedSIGUSR2;
-    sigemptyset(&sigactionSIGUSR2.sa_mask);
-    sigactionSIGUSR2.sa_flags = SA_SIGINFO;
-    sigaction(SIGUSR2, &sigactionSIGUSR2, NULL);
 
     microSecunds = (__useconds_t)rand() % 10000000;
     usleep(microSecunds);
@@ -38,10 +33,10 @@ int childProccess() {
 
     pause();
 }
+
 void recivedSIGUSR1(int sig, siginfo_t *siginfo, void *ucontext) {
     int indexOfSignal = -1;
     for (int i = 0; i < info->size; ++i) {
-        //printf("%d:%d\n", info->itsPID[i], siginfo->si_pid);
         if(info->itsPID[i] == siginfo->si_pid) {
             indexOfSignal = i;
             info->hasAsked[i] = 1;
@@ -60,18 +55,26 @@ void recivedSIGUSR1(int sig, siginfo_t *siginfo, void *ucontext) {
             if(info->hasAsked[i]) {
                 printf("Allowed signal %d to send real time signal!\n", info->itsPID[i]);
                 kill(info->itsPID[i], SIGUSR2);
-                break;
             }
         }
     } else if (info->counterOfRequests > info->limitOfRequests) {
-        kill(siginfo->si_pid, SIGUSR2);
         printf("Allowed signal %d to send real time signal!\n", siginfo->si_pid);
-        info->hasAsked[indexOfSignal] = 1;
+        kill(siginfo->si_pid, SIGUSR2);
     }
 }
 
 void recivedSIGRT(int sig, siginfo_t *siginfo, void *ucontext) {
     printf("Recived real time signal %d from %d! \n", sig, siginfo->si_pid);
+}
+
+void recivedSIGINT(int sig, siginfo_t *siginfo, void *ucontext) {
+    for (int i = 0; i < info->size; ++i) {
+        int status;
+        if (waitpid(info->itsPID[i], &status, WNOHANG) > 0) {
+            kill(info->itsPID[i], SIGKILL);
+        }
+    }
+    exit(SIGINT);
 }
 
 int main(int argc, char *argv[]) {
@@ -97,6 +100,18 @@ int main(int argc, char *argv[]) {
         sigaction(SIGRTMIN + j, &sigactionSIGRT, NULL);
     }
 
+    struct sigaction sigactionSIGUSR2;
+    sigactionSIGUSR2.sa_sigaction = recivedSIGUSR2;
+    sigemptyset(&sigactionSIGUSR2.sa_mask);
+    sigactionSIGUSR2.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR2, &sigactionSIGUSR2, NULL);
+
+    struct sigaction sigactionSIGINT;
+    sigactionSIGINT.sa_sigaction = recivedSIGINT;
+    sigemptyset(&sigactionSIGINT.sa_mask);
+    sigactionSIGINT.sa_flags = SA_SIGINFO;
+    sigaction(SIGINT, &sigactionSIGINT, NULL);
+
     
     info = malloc(1);
     info->itsPID = malloc((size_t)(N * sizeof(pid_t)));
@@ -116,6 +131,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    while (info->counterOfRequests != N);
+
     for(int i = 0; i < info->size; i++) {
         while(1) {
             int status;
@@ -125,7 +142,7 @@ int main(int argc, char *argv[]) {
                 printf("%s \n", strerror(errno));
                 return 1;
             }
-            printf("Child proccess which PID was %d returned %d\n", childPID, status);
+            printf("Child proccess which PID was %d returned %d\n", childPID, status / 256);
             break;
         }
     }
