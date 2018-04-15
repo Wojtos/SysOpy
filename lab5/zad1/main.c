@@ -41,16 +41,19 @@ int execFunction(char* args[6][6], int numberOfPipes) {
                 exit(1);
             }
         } else {
-            if (k < numberOfPipes - 1) close(fd[k][1]);
-            if (k != 0) close(fd[k-1][0]);
-            int statloc;
-            wait(&statloc);
-            if (statloc != 0) {
-                if (WIFEXITED(statloc)) printf("%s \n", strerror(WEXITSTATUS(statloc)));
-                printf("Executing function error! \n");
-                return 1;
+            if (k < numberOfPipes - 1) {
+                close(fd[k][1]);
+                wait(NULL);
             }
+            if (k != 0) close(fd[k-1][0]);
         }
+    }
+
+    int statloc;
+    wait(&statloc);
+    if (statloc != 0) {
+        printf("Executing function error! \n");
+        return 1;
     }
 
     return 0;
@@ -77,7 +80,7 @@ int main(int argc, char *argv[]){
                     args[k][i] = NULL;
                 }
             }
-            
+
             args[0][0] = strtok(buffer, "|\n");
             int i = 0;
             while (i < 5 && args[i][0]) {
