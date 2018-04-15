@@ -14,14 +14,7 @@ int execFunction(char* args[6][6], int numberOfPipes) {
         }
     }
     printf("\n");
-/*
-    for (int j = 0; j < numberOfPipes; ++j) {
-        for (int i = 0; i < 6 && args[j][i]; ++i) {
-            printf("%s ", args[j][i]);
-        }
-        printf("\n");
-    }
-*/
+
     int fd[6][2];
     for (int k = 0; k < numberOfPipes; ++k) {
         if (k < numberOfPipes - 1) pipe(fd[k]);
@@ -106,9 +99,11 @@ int main(int argc, char *argv[]){
             }
 
             if (execFunction(args, numberOfPipes) == 1) {
+                fclose(file);
                 return 1;
             }
         }
+        fclose(file);
     }
     return 0;
 }
