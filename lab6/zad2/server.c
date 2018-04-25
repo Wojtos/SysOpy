@@ -1,10 +1,10 @@
-#include <time.h>
 #include "shared.h"
+
 
 int mainQueueID;
 
-int numberOfClientQueues = 0;
-int clientQueues[MAX_CLIENT_NUMBER];
+mqd_t numberOfClientQueues = 0;
+mqd_t clientQueues[MAX_CLIENT_NUMBER];
 
 char* strrev(char *str)
 {
@@ -22,9 +22,10 @@ char* strrev(char *str)
 }
 
 void deleteQueues() {
-    msgctl(mainQueueID, IPC_RMID, NULL);
+    mq_close(mainQueueID);
+    mq_unlink(SERVER_NAME);
     for (int i = 0; i < numberOfClientQueues; ++i) {
-        msgctl(clientQueues[i], IPC_RMID, NULL);
+        mq_close(clientQueues[i]);
     }
 }
 
@@ -33,12 +34,14 @@ void handlerSIGINT() {
 }
 
 int initServer() {
-    key_t mainQueueKey = ftok("/home", serverProjId);
-
     atexit(deleteQueues);
     signal(SIGINT, handlerSIGINT);
 
-    mainQueueID = msgget(mainQueueKey, S_IRWXU|IPC_CREAT|IPC_EXCL);
+    struct mq_attr attr;
+    attr.mq_msgsize = sizeof(struct msgbuf);
+    attr.mq_maxmsg = 10;
+
+    mainQueueID = mq_open(SERVER_NAME, O_RDONLY|O_CREAT|O_EXCL , S_IRWXU, &attr);
     if (mainQueueID == -1) {
         printf("%s \n", strerror(errno));
         return 1;
@@ -49,20 +52,10 @@ int initServer() {
 int startServer() {
     struct msgbuf toSend;
     struct msgbuf recived;
-    int end = 0;
     while (1) {
-        if (!end) {
-            if (msgrcv(mainQueueID, &recived, msgsz, 0, 0) == -1) {
-                printf("%s \n", strerror(errno));
-                return 1;
-            }
-        } else {
-            if (msgrcv(mainQueueID, &recived, msgsz, 0, IPC_NOWAIT) == -1) {
-                if (errno == ENOMSG)
-                    return 0;
-                printf("%s \n", strerror(errno));
-                return 1;
-            }
+        if (mq_receive(mainQueueID, (char*)&recived, msgsz, NULL) == -1) {
+            printf("%s \n", strerror(errno));
+            return 1;
         }
 
         char* args[6];
@@ -80,8 +73,14 @@ int startServer() {
             toSend.idInMainQueue = numberOfClientQueues;
             recived.idInMainQueue = numberOfClientQueues;
 
+            char bufferName[100];
+            sprintf(bufferName, "/clientQueue%d", recived.pid);
 
-            clientQueues[numberOfClientQueues] = msgget(recived.queueKey, S_IRWXU);
+            struct mq_attr attr;
+            attr.mq_msgsize = sizeof(struct msgbuf);
+            attr.mq_maxmsg = 10;
+
+            clientQueues[numberOfClientQueues] = mq_open(bufferName, O_WRONLY , S_IRWXU, &attr);
             numberOfClientQueues++;
 
 
@@ -114,10 +113,10 @@ int startServer() {
 
             strftime(toSend.buffer, 100, "%d %m %Y %H:%M", t);
         } else if (recived.mtype == END) {
-            end = 1;
+            return 0;
         }
 
-        if (recived.mtype != END && msgsnd(clientQueues[recived.idInMainQueue], &toSend, msgsz, 0) == -1) {
+        if (mq_send(clientQueues[recived.idInMainQueue], (char*)&toSend, msgsz, 0) == -1) {
             printf("%s \n", strerror(errno));
             return 1;
         }

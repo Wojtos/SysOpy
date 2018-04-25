@@ -5,10 +5,13 @@ pid_t pid;
 int mainQueueID;
 int clientQueueID;
 
+char bufferName[100];
+
 int clientIDinMainQueue;
 
 void deleteClientQueue() {
-    msgctl(clientQueueID, IPC_RMID, NULL);
+    mq_close(clientQueueID);
+    mq_unlink(bufferName);
 
 }
 
@@ -48,7 +51,7 @@ int operationHandler(char* args[], int size) {
         printf("%s \n", "Improper operation!");
     }
 
-    if (msgsnd(mainQueueID, &toSend, msgsz, 0) == -1) {
+    if (mq_send(mainQueueID, (char*)&toSend, msgsz, 0) == -1) {
         printf("%s \n", strerror(errno));
         return 1;
     }
@@ -56,7 +59,7 @@ int operationHandler(char* args[], int size) {
     if (toSend.mtype == END) return 2;
 
 
-    if (msgrcv(clientQueueID, &recived, msgsz, toSend.mtype, 0) == -1) {
+    if (mq_receive(clientQueueID, (char*)&recived, msgsz, NULL) == -1) {
         printf("%s \n", strerror(errno));
         return 1;
     }
@@ -68,20 +71,22 @@ int operationHandler(char* args[], int size) {
 int initClient() {
     pid = getpid();
 
-    key_t clientQueueKey = ftok("/home", pid);
-    key_t mainClientKey = ftok("/home", serverProjId);
-
+    sprintf(bufferName, "/clientQueue%d", pid);
 
     atexit(deleteClientQueue);
     signal(SIGINT, handlerSIGINT);
 
-    clientQueueID = msgget(clientQueueKey, S_IRWXU|IPC_CREAT|IPC_EXCL);
+    struct mq_attr attr;
+    attr.mq_msgsize = sizeof(struct msgbuf);
+    attr.mq_maxmsg = 10;
+    
+    clientQueueID = mq_open(bufferName, O_RDONLY|O_CREAT|O_EXCL , S_IRWXU, &attr);
     if (clientQueueID == -1) {
         printf("%s \n", strerror(errno));
         return 1;
     }
 
-    mainQueueID = msgget(mainClientKey, S_IRWXU);
+    mainQueueID = mq_open(bufferName, O_WRONLY , S_IRWXU, &attr);
     if (mainQueueID == -1) {
         printf("%s \n", strerror(errno));
         return 1;
@@ -90,21 +95,19 @@ int initClient() {
     struct msgbuf toSend;
 
     toSend.pid = pid;
-    toSend.queueKey = clientQueueKey;
     toSend.mtype = REGISTER;
+    
 
-
-
-    if (msgsnd(mainQueueID, &toSend, msgsz, 0) == -1) {
+    if (mq_send(mainQueueID, (char*)&toSend, msgsz, 0) == -1) {
         printf("%s \n", strerror(errno));
         return 1;
     }
 
 
     struct msgbuf recived;
+    
 
-
-    if (msgrcv(clientQueueID, &recived, msgsz, REGISTER, 0) == -1) {
+    if (mq_receive(clientQueueID, (char*)&recived, msgsz, NULL) == -1) {
         printf("%s \n", strerror(errno));
         return 1;
     }
