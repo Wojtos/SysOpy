@@ -10,12 +10,18 @@
 #include <stdlib.h>
 #include <zconf.h>
 #include <signal.h>
+#include <string.h>
 
 #define MAX_CLIENT_NUMBER 512
 #define MAX_BUFFER_SIZE 2048
 
 enum mtype {
-    REGISTER = 1
+    REGISTER = 1,
+    MIRROR,
+    CALC,
+    TIME,
+    END,
+    STOP
 };
 
 
