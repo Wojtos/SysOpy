@@ -86,7 +86,7 @@ int initClient() {
         return 1;
     }
 
-    mainQueueID = mq_open(bufferName, O_WRONLY , S_IRWXU, &attr);
+    mainQueueID = mq_open(SERVER_NAME, O_WRONLY , S_IRWXU, &attr);
     if (mainQueueID == -1) {
         printf("%s \n", strerror(errno));
         return 1;
@@ -112,7 +112,9 @@ int initClient() {
         return 1;
     }
 
+
     clientIDinMainQueue = recived.idInMainQueue;
+    return 0;
 }
 
 int startClient(char* filePath) {
@@ -154,6 +156,8 @@ int main(int argc, char *argv[]) {
         if (initClient() == 1) {
             return 1;
         }
+
+        printf("%s \n", "Ready to call!");
 
         return startClient(argv[1]);
 

@@ -41,6 +41,7 @@ int initServer() {
     attr.mq_msgsize = sizeof(struct msgbuf);
     attr.mq_maxmsg = 10;
 
+
     mainQueueID = mq_open(SERVER_NAME, O_RDONLY|O_CREAT|O_EXCL , S_IRWXU, &attr);
     if (mainQueueID == -1) {
         printf("%s \n", strerror(errno));
@@ -57,7 +58,7 @@ int startServer() {
             printf("%s \n", strerror(errno));
             return 1;
         }
-
+        
         char* args[6];
         strcpy(toSend.buffer, "");
 
