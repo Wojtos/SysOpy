@@ -58,7 +58,7 @@ int startServer() {
             printf("%s \n", strerror(errno));
             return 1;
         }
-        
+
         char* args[6];
         strcpy(toSend.buffer, "");
 

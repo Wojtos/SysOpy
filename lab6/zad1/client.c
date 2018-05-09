@@ -110,6 +110,7 @@ int initClient() {
     }
 
     clientIDinMainQueue = recived.idInMainQueue;
+    return 0;
 }
 
 int startClient(char* filePath) {
@@ -144,6 +145,7 @@ int startClient(char* filePath) {
             args[k] = NULL;
         }
     }
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
