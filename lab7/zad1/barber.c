@@ -25,6 +25,7 @@ void handlerSIGTERM(pid_t pid) {
 int initBarber(int queueSize) {
     atexit(endBarber);
     signal(SIGTERM, handlerSIGTERM);
+    signal(SIGINT, handlerSIGTERM);
 
     key_t semaphoreKey = ftok("/home", projId);
     key_t sharedMemoryKey = ftok("/home/wojtek", projId);
@@ -53,10 +54,11 @@ int initBarber(int queueSize) {
         return 1;
     }
 
-    block->indexOfFirstCustomer = -1;
-    block->indexOfLastCustomer = -1;
+    block->indexOfLastCustomerToCut = -1;
+    block->indexOfLastCutCustomer = -1;
     block->realQueueSize = queueSize;
-    block->isBarberSleeping = 1;
+    block->barberStatus = SLEEP;
+    block->chairStatus = EMPTY;
 
     return 0;
 }
@@ -93,12 +95,56 @@ int returnSemaphore() {
     return 0;
 }
 
+int isQueueEmpty() {
+    return block->indexOfLastCustomerToCut == -1 || block->indexOfLastCustomerToCut == block->indexOfLastCutCustomer;
+}
+
+pid_t shiftQueue() {
+    return block->queue[block->indexOfLastCutCustomer + 1];
+}
+
 int startBarber() {
     while(1) {
         if (getSemaphore() == 1) return 1;
-        printf("Tutaj\n");
+
+        if(block->barberStatus == SLEEP) {
+            //printf("%ld: I have just awaken!\n", getTime());
+
+            if(isQueueEmpty()) {
+                //printf("%ld: I have just fallen asleep!\n", getTime());
+            } else {
+                block->barberStatus = HASINVITED;
+                block->chair = shiftQueue();
+                printf("%ld: I have just invited %d to cut!\n", getTime(), block->chair);
+            }
+        } else if(block->barberStatus == HASINVITED) {
+            if (block->chairStatus == SAT) {
+                block->barberStatus = STARTEDTOCUT;
+                printf("%ld: I have just started cutting %d\n", getTime(), block->chair);
+            }
+        } else if(block->barberStatus == STARTEDTOCUT) {
+            block->barberStatus = FINISHEDCUTTING;
+            printf("%ld: I have just finished cutting %d\n", getTime(), block->chair);
+        } else if(block->barberStatus == FINISHEDCUTTING) {
+            if (block->chairStatus == EMPTY) {
+                if(isQueueEmpty()) {
+                    block->barberStatus = SLEEP;
+                    printf("%ld: I have just fallen asleep!\n", getTime());
+                } else {
+                    block->barberStatus = HASINVITED;
+                    block->chair = shiftQueue();
+                    printf("%ld: I have just invited %d to cut!\n", getTime(), block->chair);
+                }
+            }
+        } else if(block->barberStatus == AWAKEN) {
+            printf("%ld: I have just awaken!\n", getTime());
+            if (block->chairStatus == SAT) {
+                block->barberStatus = STARTEDTOCUT;
+                printf("%ld: I have just started cutting %d\n", getTime(), block->chair);
+            }
+        }
+
         if (returnSemaphore() == 1) return 1;
-        return 0;
     }
 }
 

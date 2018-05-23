@@ -14,6 +14,7 @@
 #include <zconf.h>
 #include <signal.h>
 #include <string.h>
+#include <sys/wait.h>
 
 
 #define MAX_CLIENT_NUMBER 512
@@ -22,13 +23,30 @@
 
 const int projId = 60;
 
+enum BarberStatus {
+    SLEEP,
+    AWAKEN,
+    HASINVITED,
+    STARTEDTOCUT,
+    FINISHEDCUTTING
+};
+
+enum ChairStatus {
+    EMPTY,
+    SAT
+};
+
 struct sharedMemoryBlock {
     pid_t queue[MAX_QUEUE_SIZE];
-    int indexOfFirstCustomer;
-    int indexOfLastCustomer;
+    pid_t chair;
+    int indexOfLastCutCustomer;
+    int indexOfLastCustomerToCut;
     int realQueueSize;
-    int isBarberSleeping;
+    enum BarberStatus barberStatus;
+    enum ChairStatus chairStatus;
 
 } *block;
+
+
 
 #endif //ZAD1_SHARED_H
