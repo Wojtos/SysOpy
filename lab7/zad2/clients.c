@@ -1,13 +1,16 @@
 #include "shared.h"
 
-int semaphoreId;
+sem_t* semaphoreId;
 int sharedMemoryId;
 
 void endClients() {
-    if (shmdt(block) == -1) {
-        printf("%sy \n", strerror(errno));
+    if (sem_close(semaphoreId) == -1) {
+        printf("%sx \n", strerror(errno));
     }
 
+    if (munmap(block, MAX_SHARED_MEMORY_SIZE) == -1) {
+        printf("%sy \n", strerror(errno));
+    }
 }
 
 void handlerSIGTERM(pid_t pid) {
@@ -18,22 +21,20 @@ int initClients() {
     atexit(endClients);
     signal(SIGTERM, handlerSIGTERM);
 
-    key_t semaphoreKey = ftok("/home", projId);
-    key_t sharedMemoryKey = ftok("/home/wojtek", projId);
 
-    semaphoreId = semget(semaphoreKey, 0, 0);
-    if (semaphoreId == -1) {
+    semaphoreId = sem_open(semaphoreName, O_RDWR);
+    if (semaphoreId == SEM_FAILED) {
         printf("%sa \n", strerror(errno));
         return 1;
     }
 
-    sharedMemoryId = shmget(sharedMemoryKey, 0, 0);
+    sharedMemoryId = shm_open(sharedMemoryName, O_RDWR, 0700);
     if (sharedMemoryId == -1) {
         printf("%sk \n", strerror(errno));
         return 1;
     }
 
-    block = shmat(sharedMemoryId, NULL, 0);
+    block = mmap(NULL, MAX_SHARED_MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, sharedMemoryId, 0);
     if (block == (void *) -1) {
         printf("%sl \n", strerror(errno));
         return 1;
@@ -50,12 +51,7 @@ long getTime() {
 }
 
 int getSemaphore() {
-    struct sembuf buf[1];
-    buf[0].sem_num = 0;
-    buf[0].sem_op = -1;
-    buf[0].sem_flg = 0;
-
-    if (semop(semaphoreId, buf, 1) == -1) {
+    if (sem_wait(semaphoreId) == -1) {
         printf("%s1 \n", strerror(errno));
         return 1;
     }
@@ -63,12 +59,7 @@ int getSemaphore() {
 }
 
 int returnSemaphore() {
-    struct sembuf buf[1];
-    buf[0].sem_num = 0;
-    buf[0].sem_op = 1;
-    buf[0].sem_flg = 0;
-
-    if (semop(semaphoreId, buf, 1) == -1) {
+    if (sem_post(semaphoreId) == -1) {
         printf("%s2 \n", strerror(errno));
         return 1;
     }
@@ -164,7 +155,10 @@ int startClients(int amountOfClients, int amountOfBarbers) {
         amountOfClients--;
         //printf("%s\n", strerror(WEXITSTATUS(status)));
     }
-
+/*
+    while(wait(NULL) != -1 && errno != ECHILD);
+    printf("Tutaj jestem chlopaki! \n");
+*/
     return 0;
 
 }
