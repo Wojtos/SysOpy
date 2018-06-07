@@ -148,11 +148,13 @@ double countPixel(int x, int y) {
 void* threadWork(void* tmp) {
     struct threadInfo* info;
     info = (struct threadInfo*)tmp;
-    
-    int startingHeight = (info->index/quantityOfThreads) * height;
-    int endingHeight = ((info->index + 1)/quantityOfThreads) * height;
 
-    for (int i = startingHeight; i < height && i < endingHeight; ++i) {
+    int startingHeight = (height * info->index)/quantityOfThreads;
+    int endingHeight = (height * (info->index + 1))/quantityOfThreads;
+
+    printf("%d: %d -> %d\n", info->index, startingHeight, endingHeight);
+
+    for (int i = startingHeight; i < endingHeight; ++i) {
         for (int j = 0; j < width; ++j) {
             outputPixels[i][j] = (__uint8_t)countPixel(i, j);
         }

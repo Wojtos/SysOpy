@@ -70,11 +70,6 @@ int isQueueEmpty() {
     return block->indexOfLastCustomerToCut == -1 && block->indexOfLastCustomerToCut == block->indexOfLastCutCustomer;
 }
 
-pid_t shiftQueue() {
-    block->indexOfLastCutCustomer++;
-    return block->queue[block->indexOfLastCutCustomer];
-}
-
 int isQueueFull() {
     return block->indexOfLastCustomerToCut - block->indexOfLastCutCustomer >= block->realQueueSize;
 }

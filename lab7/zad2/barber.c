@@ -92,7 +92,6 @@ pid_t shiftQueue() {
 int startBarber() {
     while(1) {
         if (getSemaphore() == 1) return 1;
-
         if(block->barberStatus == SLEEP) {
             //printf("%ld: I have just awaken!\n", getTime());
 

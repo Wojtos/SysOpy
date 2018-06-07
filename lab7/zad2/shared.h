@@ -48,8 +48,8 @@ struct sharedMemoryBlock {
 
 } *block;
 
-const char semaphoreName[20] = "/PICKO";
-const char sharedMemoryName[20] = "/PIC";
+const char semaphoreName[20] = "/PIKsadO";
+const char sharedMemoryName[20] = "/asdIC";
 
 
 #endif //ZAD1_SHARED_H
